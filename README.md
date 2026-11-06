@@ -1,7 +1,13 @@
-# پلتفرم فروش بلیت رویداد (نام کاری موقت)
+﻿# یول‌تیک (Yoltic) — پلتفرم فروش بلیت رویداد
 
-**وضعیت:** G1 تأیید شد (پاسخ‌های مالک در `docs/DECISIONS.md`). آماده شروع M0.
+**وضعیت:** M0 انجام شد. مستندات: `AGENTS.md` · `docs/`.
 
-مستندات: `AGENTS.md` · `docs/PRD.md` · `DOMAIN-RULES.md` · `ARCHITECTURE.md` · `DECISIONS.md` · `PLAN-AND-TASKS.md` · `TEST-AND-SECURITY.md` · `OPERATIONS.md` · `OWNER-ACTIONS.md`
+## اجرا از محیط تمیز
+1. Node.js ۲۰ تا ۲۴ و PostgreSQL ۱۸ نصب باشد.
+2. `npm install`
+3. `copy .env.example .env` و مقدارها را پر کنید.
+4. دیتابیس محلی پروژه (داخل `.local/`، پورت ۵۴۳۳): ساخت یک‌باره با `initdb`، سپس `powershell scripts/db-start.ps1`. کاربر/دیتابیس‌ها: `yoltick_app` / `yoltick_dev` / `yoltick_test`.
+5. `npm run migrate` · `npm run dev`
 
-ورودی‌های اصلی مالک: `MASTER_PROJECT_BRIEF_FA_v2.md` و `AGENT-PROMPTS-AND-TEMPLATES_FA.md` (نیازی به آرشیو نیست).
+## دستورها
+`npm run lint` · `npm run typecheck` · `npm test` · `npm run build`
