@@ -1,0 +1,66 @@
+﻿import Link from 'next/link';
+import type { ReactNode } from 'react';
+
+const NAV = [
+  { href: '/', label: 'رویدادها' },
+  { href: '/my-tickets', label: 'بلیت‌های من' },
+  { href: '/rules', label: 'قوانین' },
+  { href: '/contact', label: 'تماس' },
+];
+
+export function SiteHeader() {
+  return (
+    <header className="sticky top-0 z-10 border-b border-line bg-surface/95 backdrop-blur">
+      <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-3">
+        <Link href="/" className="text-xl font-extrabold text-primary">
+          یول‌تیک
+        </Link>
+        <nav aria-label="منوی اصلی" className="flex gap-1 overflow-x-auto">
+          {NAV.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="inline-flex min-h-11 items-center rounded-lg px-3 text-sm font-medium hover:bg-background"
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+      </div>
+    </header>
+  );
+}
+
+export function SiteFooter() {
+  return (
+    <footer className="mt-16 border-t border-line bg-surface">
+      <div className="mx-auto flex max-w-5xl flex-wrap gap-4 px-4 py-6 text-sm text-muted">
+        <span>یول‌تیک — فروش بلیت رویداد</span>
+        <Link href="/rules" className="underline">
+          قوانین
+        </Link>
+        <Link href="/privacy" className="underline">
+          حریم خصوصی
+        </Link>
+        <Link href="/contact" className="underline">
+          تماس و پشتیبانی
+        </Link>
+      </div>
+    </footer>
+  );
+}
+
+export function PageShell({ children }: { children: ReactNode }) {
+  return (
+    <>
+      <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:p-3">
+        رفتن به محتوا
+      </a>
+      <SiteHeader />
+      <main id="main" className="mx-auto max-w-5xl px-4 py-8">
+        {children}
+      </main>
+      <SiteFooter />
+    </>
+  );
+}

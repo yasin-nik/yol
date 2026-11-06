@@ -9,9 +9,13 @@ export async function migrate(url: string): Promise<string[]> {
     await pool.query(
       'CREATE TABLE IF NOT EXISTS schema_migrations (name text PRIMARY KEY, applied_at timestamptz NOT NULL DEFAULT now())',
     );
-    const done = new Set((await pool.query('SELECT name FROM schema_migrations')).rows.map((r) => r.name));
+    const done = new Set(
+      (await pool.query('SELECT name FROM schema_migrations')).rows.map((r) => r.name),
+    );
     const dir = join(process.cwd(), 'migrations');
-    for (const file of readdirSync(dir).filter((f) => f.endsWith('.sql')).sort()) {
+    for (const file of readdirSync(dir)
+      .filter((f) => f.endsWith('.sql'))
+      .sort()) {
       if (done.has(file)) continue;
       const client = await pool.connect();
       try {
