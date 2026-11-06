@@ -63,3 +63,16 @@ Done · really tested · incomplete · decisions needed (recommendation + defaul
 
 ## Tool independence
 Repo alone must suffice for any agent. Tool-specific files only point here.
+
+## Environment isolation
+- Everything stays inside D:\YolTick. Never write outside it, except to
+  install a missing prerequisite after asking the owner.
+- Dependencies: project-local only (npm install without -g; pin the Node
+  version in package.json "engines" and .nvmrc). No global installs.
+- Database: use a separate PostgreSQL database and user created just for
+  this project (names prefixed "yoltick_"). Never touch other databases.
+  Prefer a project-local instance (e.g. Docker, or a PostgreSQL data dir
+  inside the project) over changing a system-wide install.
+- Never modify system settings, PATH, registry, or other projects.
+- Keep config in .env (git-ignored) with a committed .env.example.
+- Ask the owner before anything that needs admin rights.
