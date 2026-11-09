@@ -7,3 +7,5 @@ dist/
 *.log
 .local/
 *.tsbuildinfo
+.next-review/
+.next-start.*

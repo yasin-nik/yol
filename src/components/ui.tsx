@@ -42,5 +42,9 @@ export function StatusPill({ status }: { status: 'ON_SALE' | 'SOLD_OUT' | 'UPCOM
     UPCOMING: ['به‌زودی', 'bg-primary/10 text-primary'],
   } as const;
   const [label, cls] = map[status];
-  return <span className={`rounded-full px-3 py-1 text-xs font-bold ${cls}`}>{label}</span>;
+  return (
+    <span className={`shrink-0 whitespace-nowrap rounded-full px-3 py-1 text-xs font-bold ${cls}`}>
+      {label}
+    </span>
+  );
 }

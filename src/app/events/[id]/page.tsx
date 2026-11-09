@@ -18,7 +18,7 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
         <h1 className="text-2xl font-extrabold">{event.title}</h1>
         <StatusPill status={event.status} />
       </div>
-      <dl className="mt-4 grid gap-2 text-sm sm:grid-cols-2">
+      <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-3">
         <div>
           <dt className="text-muted">مکان</dt>
           <dd>

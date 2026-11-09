@@ -20,7 +20,7 @@ export function SiteHeader() {
             <Link
               key={item.href}
               href={item.href}
-              className="inline-flex min-h-11 items-center rounded-lg px-3 text-sm font-medium hover:bg-background"
+              className="inline-flex min-h-11 items-center whitespace-nowrap rounded-lg px-2 text-sm font-medium hover:bg-background sm:px-3"
             >
               {item.label}
             </Link>

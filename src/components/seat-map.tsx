@@ -13,6 +13,13 @@ const COLORS: Record<SeatMapSeat['status'], string> = {
   BLOCKED: 'fill-slate-300',
 };
 
+const SWATCH: Record<SeatMapSeat['status'], string> = {
+  AVAILABLE: 'bg-emerald-600',
+  HELD: 'bg-amber-500',
+  SOLD: 'bg-slate-400',
+  BLOCKED: 'bg-slate-300',
+};
+
 const LABELS: Record<SeatMapSeat['status'], string> = {
   AVAILABLE: 'آزاد',
   HELD: 'در حال خرید',
@@ -97,7 +104,7 @@ export function SeatMap({
           {(Object.keys(LABELS) as SeatMapSeat['status'][]).map((status) => (
             <li key={status} className="flex items-center gap-1">
               <span
-                className={`inline-block h-3 w-3 rounded-sm ${COLORS[status].replace('fill-', 'bg-')}`}
+                className={`inline-block h-3 w-3 rounded-sm ${SWATCH[status]}`}
                 aria-hidden="true"
               />
               {LABELS[status]}
@@ -149,7 +156,7 @@ export function SeatMap({
                         x={(seat.col - 1) * (W + GAP) + W / 2}
                         y={W / 2 + 4}
                         textAnchor="middle"
-                        className="pointer-events-none fill-white text-[11px]"
+                        className={`pointer-events-none text-[11px] font-bold ${isSelected || seat.status === 'AVAILABLE' ? 'fill-white' : 'fill-slate-900'}`}
                         aria-hidden="true"
                       >
                         {seat.col.toLocaleString('fa-IR')}
