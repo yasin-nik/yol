@@ -11,11 +11,11 @@ const NAV = [
 export function SiteHeader() {
   return (
     <header className="sticky top-0 z-10 border-b border-line bg-surface/95 backdrop-blur">
-      <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-3">
+      <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-2 px-4 py-3">
         <Link href="/" className="text-xl font-extrabold text-primary">
           یول‌تیک
         </Link>
-        <nav aria-label="منوی اصلی" className="flex gap-1 overflow-x-auto">
+        <nav aria-label="منوی اصلی" className="flex flex-wrap gap-1">
           {NAV.map((item) => (
             <Link
               key={item.href}

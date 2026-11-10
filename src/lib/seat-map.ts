@@ -15,7 +15,7 @@ export const GAP = 8;
 
 export function seatMapWidth(rows: SeatMapRow[]): number {
   const cols = Math.max(1, ...rows.map((r) => r.seats.length));
-  return cols * (W + GAP) + 40;
+  return cols * (W + GAP) + 160;
 }
 
 export function seatMapHeight(rows: SeatMapRow[]): number {
@@ -29,7 +29,7 @@ export function selectSeat(current: string[], seatId: string, limit: number): st
 }
 
 export function seatLabel(seat: SeatMapSeat): string {
-  return `ردیف ${toFa(seat.row)} صندلی ${toFa(seat.col)}`;
+  return seat.label || `ردیف ${toFa(seat.row)} صندلی ${toFa(seat.col)}`;
 }
 
 function toFa(value: number) {

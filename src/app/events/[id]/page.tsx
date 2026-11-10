@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import Link from 'next/link';
 import { PageShell } from '@/components/shell';
 import { SampleBadge, StatusPill } from '@/components/ui';
 import { formatJalaliDate, formatJalaliTime, formatToman } from '@/lib/format';
@@ -10,10 +11,34 @@ import { publicEvent } from '@/server/catalog';
 export default async function EventPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const real = await publicEvent(id);
-  if (real) return <PageShell>
-    <h1 className="text-2xl font-extrabold">{real.title}</h1><p className="mt-2 text-sm text-muted">{real.category}</p><p className="mt-4 whitespace-pre-line">{real.description}</p>
-    <h2 className="mb-4 mt-8 text-lg font-bold">سانس‌ها</h2><ul className="grid gap-4 sm:grid-cols-2">{real.sessions.map((session) => <li key={session.id} className="rounded-xl border border-line bg-surface p-5"><h3 className="font-bold">{session.venue}، {session.city}</h3><p>{formatJalaliDate(session.starts_at)} · {formatJalaliTime(session.starts_at)}</p><p className="mt-2 text-sm text-muted">{session.address}</p></li>)}</ul>
-  </PageShell>;
+  if (real)
+    return (
+      <PageShell>
+        <h1 className="text-2xl font-extrabold">{real.title}</h1>
+        <p className="mt-2 text-sm text-muted">{real.category}</p>
+        <p className="mt-4 whitespace-pre-line">{real.description}</p>
+        <h2 className="mb-4 mt-8 text-lg font-bold">سانس‌ها</h2>
+        <ul className="grid gap-4 sm:grid-cols-2">
+          {real.sessions.map((session) => (
+            <li key={session.id} className="rounded-xl border border-line bg-surface p-5">
+              <h3 className="font-bold">
+                {session.venue}، {session.city}
+              </h3>
+              <p>
+                {formatJalaliDate(session.starts_at)} · {formatJalaliTime(session.starts_at)}
+              </p>
+              <p className="mt-2 text-sm text-muted">{session.address}</p>
+              <Link
+                href={`/sessions/${session.id}`}
+                className="mt-4 inline-flex min-h-12 items-center rounded-xl bg-primary px-5 text-on-primary"
+              >
+                انتخاب صندلی
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </PageShell>
+    );
   const event = process.env.NODE_ENV === 'production' ? null : findSampleEvent(id);
   if (!event) notFound();
   const canBuy = event.status === 'ON_SALE';

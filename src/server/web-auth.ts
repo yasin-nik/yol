@@ -4,7 +4,13 @@ import { requireAdmin } from './auth';
 import { DomainError } from './errors';
 
 export const ADMIN_COOKIE = 'yoltick_admin';
-export const cookieOptions = { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax' as const, path: '/', maxAge: 8 * 60 * 60 };
+export const cookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'lax' as const,
+  path: '/',
+  maxAge: 8 * 60 * 60,
+};
 
 export async function adminToken() {
   return (await cookies()).get(ADMIN_COOKIE)?.value;

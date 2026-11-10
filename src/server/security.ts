@@ -9,7 +9,8 @@ export const newToken = () => randomBytes(32).toString('hex');
 export const tokenHash = (value: string) => createHash('sha256').update(value).digest('hex');
 
 export async function hashPassword(password: string) {
-  if (password.length < 12 || password.length > 128) throw new DomainError('رمز باید ۱۲ تا ۱۲۸ نویسه باشد.');
+  if (password.length < 12 || password.length > 128)
+    throw new DomainError('رمز باید ۱۲ تا ۱۲۸ نویسه باشد.');
   const salt = randomBytes(16).toString('hex');
   const hash = (await scrypt(password, salt, 64)) as Buffer;
   return `${salt}:${hash.toString('hex')}`;
@@ -31,9 +32,19 @@ export async function rateLimit(key: string, limit: number, seconds: number) {
      RETURNING attempts`,
     [key, seconds],
   );
-  if (result.rows[0].attempts > limit) throw new DomainError('تعداد درخواست زیاد است؛ کمی بعد دوباره تلاش کنید.', 429);
+  if (result.rows[0].attempts > limit)
+    throw new DomainError('تعداد درخواست زیاد است؛ کمی بعد دوباره تلاش کنید.', 429);
 }
 
-export async function audit(client: PoolClient, actor: string | null, action: string, target: string, details = {}) {
-  await client.query('INSERT INTO audit_logs(actor_id, action, target_id, details) VALUES ($1,$2,$3,$4)', [actor, action, target, details]);
+export async function audit(
+  client: PoolClient,
+  actor: string | null,
+  action: string,
+  target: string,
+  details = {},
+) {
+  await client.query(
+    'INSERT INTO audit_logs(actor_id, action, target_id, details) VALUES ($1,$2,$3,$4)',
+    [actor, action, target, details],
+  );
 }

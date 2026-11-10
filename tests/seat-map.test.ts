@@ -17,9 +17,25 @@ describe('seat map selection rules', () => {
       'f',
     ]);
   });
-  it('builds a 1000-seat map width without layout overflow', () => {
+  it('preserves the existing M1 sample map with 60 seats', () => {
     const data = buildSampleSeatMap();
     expect(seatMapWidth(data.rows)).toBeGreaterThan(0);
     expect(data.rows.flatMap((r) => r.seats)).toHaveLength(60);
+  });
+  it('keeps physical targets at least 44px for a 1000-seat venue', () => {
+    const rows = Array.from({ length: 20 }, (_, rowIndex) => ({
+      index: rowIndex + 1,
+      label: String(rowIndex + 1),
+      seats: Array.from({ length: 50 }, (_, colIndex) => ({
+        id: `${rowIndex}-${colIndex}`,
+        label: 'صندلی',
+        row: rowIndex + 1,
+        col: colIndex + 1,
+        priceRial: 1000,
+        status: 'AVAILABLE' as const,
+      })),
+    }));
+    expect(rows.flatMap((row) => row.seats)).toHaveLength(1000);
+    expect(seatMapWidth(rows)).toBe(2760);
   });
 });
