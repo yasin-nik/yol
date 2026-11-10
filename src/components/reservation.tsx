@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import type { InventorySnapshot } from '@/lib/inventory';
 import { formatToman, toFaDigits } from '@/lib/format';
 import { SeatMap } from './seat-map';
+import { Checkout } from './checkout';
 
 export function Reservation({
   sessionId,
@@ -149,7 +150,7 @@ export function Reservation({
             <p role="status">رزرو به علت وضعیت پرداخت برای بررسی نگه داشته شده است.</p>
           )}
           <p className="mt-2 text-sm text-muted">
-            رزرو به این مرورگر تعلق دارد. پرداخت و صدور بلیت هنوز فعال نیست.
+            برای ثبت سفارش با شماره موبایل وارد شوید. زمان رزرو با ورود تمدید نمی‌شود.
           </p>
           <button
             disabled={busy || snapshot.hold.paymentState !== 'NONE'}
@@ -158,6 +159,7 @@ export function Reservation({
           >
             {busy ? 'در حال ثبت…' : 'لغو رزرو و انتخاب دوباره'}
           </button>
+          <Checkout sessionId={sessionId} holdId={snapshot.hold.id} disabled={remaining === 0} />
         </section>
       )}
       <SeatMap

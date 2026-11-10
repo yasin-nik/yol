@@ -21,7 +21,7 @@ type Session = {
 };
 const ownerSchema = z.string().regex(/^[a-f0-9]{64}$/);
 
-async function lockSession(
+export async function lockSession(
   client: PoolClient,
   sessionId: string,
   includeDraft = false,
@@ -43,7 +43,7 @@ async function lockSession(
   return session;
 }
 
-async function expireLocked(client: PoolClient, sessionId: string) {
+export async function expireLocked(client: PoolClient, sessionId: string) {
   const expired = await client.query(
     `UPDATE seat_holds SET status='EXPIRED' WHERE session_id=$1 AND status='ACTIVE'
      AND expires_at <= clock_timestamp() AND payment_state='NONE' RETURNING id`,
