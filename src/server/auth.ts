@@ -56,10 +56,15 @@ export async function logout(token: string | undefined) {
   if (!token) return;
   await transaction(async (client) => {
     const result = await client.query(
-      'DELETE FROM auth_sessions WHERE token_hash=$1 RETURNING user_id',
+      'DELETE FROM auth_sessions s USING users u WHERE s.user_id=u.id AND s.token_hash=$1 RETURNING s.user_id,u.role',
       [tokenHash(token)],
     );
     if (result.rowCount)
-      await audit(client, result.rows[0].user_id, 'ADMIN_LOGOUT', result.rows[0].user_id);
+      await audit(
+        client,
+        result.rows[0].user_id,
+        result.rows[0].role === 'CUSTOMER' ? 'CUSTOMER_LOGOUT' : 'ADMIN_LOGOUT',
+        result.rows[0].user_id,
+      );
   });
 }

@@ -6,6 +6,7 @@ import { PaymentButton, PrintTickets } from '@/components/payment-controls';
 import { StateBox } from '@/components/ui';
 import { customerOrders } from '@/server/orders';
 import { customerTickets } from '@/server/tickets';
+import { paymentGateway } from '@/server/payment-gateway';
 import { CUSTOMER_COOKIE } from '@/server/customer';
 import { DomainError } from '@/server/errors';
 import { formatToman, toFaDigits } from '@/lib/format';
@@ -142,7 +143,13 @@ export default async function MyTicketsPage() {
               </ul>
               <p className="font-bold">{formatToman(Number(order.total_rial))}</p>
               {order.status === 'PENDING' && !order.expired && (
-                <PaymentButton orderId={order.id} authority={order.authority ?? undefined} />
+                <PaymentButton
+                  orderId={order.id}
+                  authority={order.authority ?? undefined}
+                  checkoutUrl={
+                    order.authority ? paymentGateway().checkoutUrl(order.authority) : undefined
+                  }
+                />
               )}
               {(order.expired || order.status === 'FAILED') && (
                 <Link

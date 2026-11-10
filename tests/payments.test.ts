@@ -228,6 +228,24 @@ describe('M5 payments and tickets', () => {
       vi.unstubAllEnvs();
     }
   });
+  it('INV-05 duplicate gateway reference rolls the entire sale back without partial tickets', async () => {
+    const first = await prepared();
+    await outcome(first.authority, 'SUCCESS');
+    await verifyPayment(first.authority);
+    const reference = (
+      await getPool().query('SELECT reference FROM payments WHERE authority=$1', [first.authority])
+    ).rows[0].reference;
+    const second = await prepared(2);
+    vi.spyOn(FakePaymentGateway.prototype, 'verify').mockResolvedValueOnce({
+      state: 'VERIFIED',
+      amountRial: second.hold.totalRial,
+      reference,
+    });
+    await expect(verifyPayment(second.authority)).rejects.toThrow();
+    expect((await order(second.orderId)).status).toBe('PENDING');
+    expect(await customerTickets(second.token)).toHaveLength(0);
+    expect((await getInventory(second.sessionId, second.owner)).hold?.seatIds).toHaveLength(2);
+  });
   it('INV-05 concurrent initiation across 12 sessions does not exhaust the connection pool', async () => {
     const c = await buyer();
     const orders = [];

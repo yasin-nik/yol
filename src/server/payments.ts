@@ -3,7 +3,12 @@ import { getPool } from './db/pool';
 import { transaction } from './db/transaction';
 import { requireCustomer } from './customer';
 import { lockSession, expireLocked } from './inventory';
-import { paymentGateway, verificationSchema, FakePaymentGateway } from './payment-gateway';
+import {
+  paymentGateway,
+  verificationSchema,
+  FakePaymentGateway,
+  authoritySchema,
+} from './payment-gateway';
 import { audit, newToken, rateLimit } from './security';
 import { DomainError } from './errors';
 
@@ -29,10 +34,7 @@ export async function startPayment(token: string | undefined, orderId: string) {
     amountRial: Number(found.rows[0].total_rial),
     expiresAt: found.rows[0].expires_at,
   });
-  const authority = z
-    .string()
-    .regex(/^[a-f0-9]{64}$/)
-    .parse(result.authority);
+  const authority = authoritySchema.parse(result.authority);
   return transaction(async (client) => {
     await lockSession(client, found.rows[0].session_id);
     await expireLocked(client, found.rows[0].session_id);
@@ -66,9 +68,7 @@ export async function startPayment(token: string | undefined, orderId: string) {
 }
 
 export async function verifyPayment(authority: string) {
-  z.string()
-    .regex(/^[a-f0-9]{64}$/)
-    .parse(authority);
+  authoritySchema.parse(authority);
   const found = await getPool().query(
     'SELECT o.session_id FROM payments p JOIN orders o ON o.id=p.order_id WHERE p.authority=$1',
     [authority],
@@ -181,9 +181,7 @@ export async function verifyPayment(authority: string) {
 }
 
 export async function ownedPayment(token: string | undefined, authority: string) {
-  z.string()
-    .regex(/^[a-f0-9]{64}$/)
-    .parse(authority);
+  authoritySchema.parse(authority);
   const user = await requireCustomer(token);
   const result = await getPool().query(
     'SELECT p.authority,p.amount_rial::text,p.state,o.id order_id FROM payments p JOIN orders o ON o.id=p.order_id WHERE p.authority=$1 AND o.user_id=$2',
@@ -195,7 +193,7 @@ export async function ownedPayment(token: string | undefined, authority: string)
 export async function simulatePayment(token: string | undefined, input: unknown) {
   const data = z
     .object({
-      authority: z.string().regex(/^[a-f0-9]{64}$/),
+      authority: authoritySchema,
       outcome: z.enum(['SUCCESS', 'FAILED', 'UNKNOWN']),
     })
     .strict()

@@ -4,6 +4,7 @@ import { CUSTOMER_COOKIE } from '@/server/customer';
 import { startPayment, ownedPayment, verifyPayment } from '@/server/payments';
 import { errorResponse, json, readJson, sameOrigin } from '@/server/http';
 import { rateLimit } from '@/server/security';
+import { paymentGateway, authoritySchema } from '@/server/payment-gateway';
 export async function POST(request: NextRequest) {
   try {
     sameOrigin(request);
@@ -12,7 +13,7 @@ export async function POST(request: NextRequest) {
       .strict()
       .parse(await readJson(request));
     const authority = await startPayment(request.cookies.get(CUSTOMER_COOKIE)?.value, orderId);
-    return json({ url: '/payments/fake/' + authority });
+    return json({ url: paymentGateway().checkoutUrl(authority) });
   } catch (e) {
     return errorResponse(e);
   }
@@ -21,7 +22,7 @@ export async function PUT(request: NextRequest) {
   try {
     sameOrigin(request);
     const { authority } = z
-      .object({ authority: z.string().regex(/^[a-f0-9]{64}$/) })
+      .object({ authority: authoritySchema })
       .strict()
       .parse(await readJson(request));
     await ownedPayment(request.cookies.get(CUSTOMER_COOKIE)?.value, authority);

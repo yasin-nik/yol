@@ -3,6 +3,12 @@ import { getPool } from './db/pool';
 import { newToken } from './security';
 import { DomainError } from './errors';
 
+export const authoritySchema = z
+  .string()
+  .min(1)
+  .max(200)
+  .regex(/^[A-Za-z0-9_-]+$/);
+
 export const verificationSchema = z.discriminatedUnion('state', [
   z
     .object({
@@ -21,9 +27,13 @@ export interface PaymentGateway {
     expiresAt: Date;
   }): Promise<{ authority: string }>;
   verify(authority: string): Promise<Verification>;
+  checkoutUrl(authority: string): string;
 }
 
 export class FakePaymentGateway implements PaymentGateway {
+  checkoutUrl(authority: string) {
+    return '/payments/fake/' + authoritySchema.parse(authority);
+  }
   constructor() {
     if (process.env.NODE_ENV === 'production')
       throw new Error('Fake payment forbidden in production');

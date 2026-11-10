@@ -2,7 +2,15 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-export function PaymentButton({ orderId, authority }: { orderId: string; authority?: string }) {
+export function PaymentButton({
+  orderId,
+  authority,
+  checkoutUrl,
+}: {
+  orderId: string;
+  authority?: string;
+  checkoutUrl?: string;
+}) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
@@ -38,10 +46,10 @@ export function PaymentButton({ orderId, authority }: { orderId: string; authori
           {error}
         </p>
       )}
-      {authority && (
+      {authority && checkoutUrl && (
         <a
           className="inline-flex min-h-11 items-center px-3 text-primary underline"
-          href={'/payments/fake/' + authority}
+          href={checkoutUrl}
         >
           بازگشت به درگاه آزمایشی
         </a>
