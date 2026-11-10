@@ -5,11 +5,15 @@ import { adminCatalog } from '@/server/catalog';
 import { requireAdminPage } from '@/server/web-auth';
 import { formatJalaliDate, formatJalaliTime } from '@/lib/format';
 import { logoutAction } from './actions';
+import { adminOrders } from '@/server/admin-orders';
+import { formatToman, toFaDigits } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminPage() {
-  const catalog = await adminCatalog(await requireAdminPage());
+  const token = await requireAdminPage();
+  const catalog = await adminCatalog(token);
+  const orders = await adminOrders(token);
   return (
     <PageShell>
       <div className="mb-6 flex items-center justify-between gap-4">
@@ -131,6 +135,35 @@ export default async function AdminPage() {
           </div>
         </section>
       </div>
+      <section className="mt-8">
+        <h2 className="mb-3 text-lg font-bold">سفارش‌ها و پرداخت‌ها</h2>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {orders.map((order) => (
+            <article
+              key={order.id}
+              className="min-w-0 space-y-2 rounded-xl border border-line bg-surface p-4"
+            >
+              <h3 className="font-bold">{order.title}</h3>
+              <p>
+                {formatToman(Number(order.total_rial))} · {toFaDigits(order.ticket_count)} بلیت
+              </p>
+              <p className={order.status === 'REVIEW' ? 'font-bold text-warning' : ''}>
+                {order.status === 'REVIEW'
+                  ? 'نیازمند رسیدگی و استرداد دستی'
+                  : order.status === 'PAID'
+                    ? 'پرداخت موفق'
+                    : order.status === 'FAILED'
+                      ? 'پرداخت ناموفق'
+                      : 'در انتظار پرداخت'}
+              </p>
+              <p className="break-all text-xs text-muted">سفارش: {order.id}</p>
+              {order.reference && (
+                <p className="break-all text-xs text-muted">مرجع درگاه: {order.reference}</p>
+              )}
+            </article>
+          ))}
+        </div>
+      </section>
       <section className="mt-8">
         <h2 className="mb-3 text-lg font-bold">سانس‌ها</h2>
         <ul className="grid gap-3 sm:grid-cols-2">

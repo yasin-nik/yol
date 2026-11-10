@@ -63,9 +63,10 @@ export async function customerOrders(token: string | undefined) {
   const user = await requireCustomer(token);
   return (
     await getPool().query(
-      `SELECT o.id,o.status,o.total_rial::text,e.title,es.starts_at,v.name venue,
+      `SELECT o.id,o.status,o.session_id,o.total_rial::text,e.title,es.starts_at,v.name venue,p.authority,p.state payment_state,
+    (h.status<>'ACTIVE' OR h.expires_at<=now()) AND p.id IS NULL expired,
     (SELECT json_agg(json_build_object('label',i.label,'priceRial',i.price_rial)) FROM order_items i WHERE i.order_id=o.id) items
-    FROM orders o JOIN event_sessions es ON es.id=o.session_id JOIN events e ON e.id=es.event_id JOIN venues v ON v.id=es.venue_id
+    FROM orders o JOIN seat_holds h ON h.id=o.hold_id LEFT JOIN payments p ON p.order_id=o.id JOIN event_sessions es ON es.id=o.session_id JOIN events e ON e.id=es.event_id JOIN venues v ON v.id=es.venue_id
     WHERE o.user_id=$1 ORDER BY o.created_at DESC LIMIT 100`,
       [user],
     )

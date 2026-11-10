@@ -36,13 +36,38 @@ body {
 }
 
 @layer components {
-  .form-label { @apply block space-y-2 text-sm font-medium; }
-  .form-input { @apply block min-h-12 w-full rounded-lg border border-line bg-background px-3 py-2 text-base text-foreground; }
+  .form-label {
+    @apply block space-y-2 text-sm font-medium;
+  }
+  .form-input {
+    @apply block min-h-12 w-full rounded-lg border border-line bg-background px-3 py-2 text-base text-foreground;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   * {
     animation: none !important;
     transition: none !important;
+  }
+}
+
+@media print {
+  header,
+  footer,
+  body > a {
+    display: none !important;
+  }
+  body {
+    background: white;
+    color: black;
+  }
+  main {
+    max-width: none !important;
+    padding: 0 !important;
+  }
+  .ticket-card {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    color: black;
   }
 }

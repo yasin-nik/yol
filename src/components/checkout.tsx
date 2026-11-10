@@ -17,7 +17,10 @@ export function Checkout({
   const router = useRouter();
   useEffect(() => {
     fetch('/api/customer')
-      .then((r) => setAuthenticated(r.ok))
+      .then((r) => {
+        if (!r.ok && r.status !== 401) throw new Error('Authentication unavailable');
+        setAuthenticated(r.ok);
+      })
       .catch(() => setError('بررسی ورود انجام نشد؛ صفحه را تازه کنید.'));
   }, []);
   if (authenticated === false)
@@ -46,7 +49,10 @@ export function Checkout({
               body: JSON.stringify({ sessionId, holdId }),
             });
             const data = await response.json();
-            if (!response.ok) throw new Error(data.error);
+            if (!response.ok) {
+              if (response.status === 401) setAuthenticated(false);
+              throw new Error(data.error);
+            }
             router.push('/my-tickets#order-' + data.id);
           } catch (e) {
             setError(e instanceof Error ? e.message : 'ثبت سفارش انجام نشد.');
