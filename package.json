@@ -12,6 +12,7 @@
     "lint": "eslint src scripts tests",
     "typecheck": "tsc --noEmit",
     "migrate": "node --env-file=.env ./node_modules/tsx/dist/cli.mjs scripts/migrate.ts",
+    "admin:create": "node --env-file=.env ./node_modules/tsx/dist/cli.mjs scripts/create-admin.ts",
     "test": "node --env-file=.env ./node_modules/vitest/vitest.mjs run"
   },
   "dependencies": {

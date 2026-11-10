@@ -3,8 +3,12 @@ import { SampleBadge, StateBox, StatusPill } from '@/components/ui';
 import Link from 'next/link';
 import { formatJalaliDate, formatJalaliTime, formatToman } from '@/lib/format';
 import { SAMPLE_EVENTS } from '@/lib/sample-data';
+import { publicEvents } from '@/server/catalog';
 
-export default function HomePage() {
+export const dynamic = 'force-dynamic';
+
+export default async function HomePage() {
+  const events = await publicEvents();
   return (
     <PageShell>
       <section className="mb-8 rounded-2xl bg-primary p-6 text-on-primary sm:p-10">
@@ -15,6 +19,12 @@ export default function HomePage() {
           کنسرت، تئاتر و استندآپ؛ نقشه سالن، انتخاب صندلی و بلیت QR.
         </p>
       </section>
+      <h2 className="mb-4 text-lg font-bold">رویدادهای منتشرشده</h2>
+      {events.length === 0 ? <StateBox kind="empty" title="هنوز رویدادی منتشر نشده است" /> : <ul className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{events.map((event) => <li key={`${event.id}-${event.city}`} className="rounded-xl border border-line bg-surface p-5">
+        <p className="text-sm text-muted">{event.category} · {event.city}</p><h3 className="mt-2 font-bold"><Link className="text-primary underline" href={`/events/${event.id}`}>{event.title}</Link></h3>
+        <p className="mt-3 text-sm">از {formatJalaliDate(event.starts_at)}</p><p className="text-sm">از {formatToman(Number(event.min_price_rial))}</p>
+      </li>)}</ul>}
+      {process.env.NODE_ENV !== 'production' && <>
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-lg font-bold">رویدادها</h2>
         <SampleBadge />
@@ -45,6 +55,7 @@ export default function HomePage() {
           ))}
         </ul>
       )}
+      </>}
     </PageShell>
   );
 }
