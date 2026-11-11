@@ -53,11 +53,14 @@ export function SiteFooter() {
 export function PageShell({ children }: { children: ReactNode }) {
   return (
     <>
-      <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:p-3">
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:fixed focus:right-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-surface focus:p-3"
+      >
         رفتن به محتوا
       </a>
       <SiteHeader />
-      <main id="main" className="mx-auto max-w-5xl px-4 py-8">
+      <main id="main" tabIndex={-1} className="mx-auto max-w-5xl px-4 py-8">
         {children}
       </main>
       <SiteFooter />

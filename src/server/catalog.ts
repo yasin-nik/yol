@@ -187,14 +187,29 @@ export async function adminCatalog(token: string | undefined) {
   };
 }
 
-export async function publicEvents() {
+export const eventFiltersSchema = z.object({
+  q: z.string().trim().max(200).default(''),
+  city: z.string().trim().max(200).default(''),
+  category: z.string().trim().max(200).default(''),
+  when: z.enum(['', 'today', 'week', 'month']).default(''),
+});
+
+export async function publicEvents(input: unknown = {}) {
+  const filters = eventFiltersSchema.parse(input);
   return (
     await getPool().query(
       `SELECT e.id,e.title,e.category, c.name city, min(es.starts_at) starts_at, min(ss.price_rial)::text min_price_rial
      FROM events e JOIN event_sessions es ON es.event_id=e.id JOIN venues v ON v.id=es.venue_id JOIN cities c ON c.id=v.city_id
      JOIN session_seats ss ON ss.session_id=es.id
      WHERE e.published AND es.published AND es.starts_at > now()
+     AND ($1='' OR strpos(lower(e.title || ' ' || e.description),lower($1))>0)
+     AND ($2='' OR c.name=$2) AND ($3='' OR e.category=$3)
+     AND ($4='' OR
+       ($4='today' AND es.starts_at < (date_trunc('day',now() AT TIME ZONE 'Asia/Tehran') + interval '1 day') AT TIME ZONE 'Asia/Tehran') OR
+       ($4='week' AND es.starts_at < now()+interval '7 days') OR
+       ($4='month' AND es.starts_at < now()+interval '30 days'))
      GROUP BY e.id,c.name ORDER BY min(es.starts_at)`,
+      [filters.q, filters.city, filters.category, filters.when],
     )
   ).rows;
 }

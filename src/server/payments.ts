@@ -10,9 +10,11 @@ import {
   authoritySchema,
 } from './payment-gateway';
 import { audit, newToken, rateLimit } from './security';
+import { requireSalesEnabled } from './deployment';
 import { DomainError } from './errors';
 
 export async function startPayment(token: string | undefined, orderId: string) {
+  requireSalesEnabled();
   z.uuid().parse(orderId);
   const user = await requireCustomer(token);
   await rateLimit(`payment:${user}`, 20, 60);

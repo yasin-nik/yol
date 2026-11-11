@@ -1,0 +1,38 @@
+# Template only. Replace DOMAIN and certificate paths; validate with nginx -t.
+# Install only after owner authorization. Never expose the Node/PostgreSQL ports.
+server {
+    listen 80;
+    server_name DOMAIN;
+    return 301 https://DOMAIN$request_uri;
+}
+server {
+    listen 443 ssl;
+    server_name DOMAIN;
+    ssl_certificate /PATH/fullchain.pem;
+    ssl_certificate_key /PATH/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    client_max_body_size 32k;
+    add_header Strict-Transport-Security "max-age=31536000" always;
+
+    # The app emits nonce-based CSP and private/no-store for dynamic responses.
+    # No proxy_cache: ticket/account/financial HTML must never be shared.
+    location / {
+        proxy_pass http://127.0.0.1:3100;
+        proxy_http_version 1.1;
+        proxy_set_header Host DOMAIN;
+        proxy_set_header X-Forwarded-Host DOMAIN;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_connect_timeout 5s;
+        proxy_read_timeout 30s;
+        proxy_send_timeout 30s;
+    }
+    # Readiness is for a same-host monitor; do not publish infrastructure status.
+    location = /api/health {
+        allow 127.0.0.1;
+        allow ::1;
+        deny all;
+        proxy_pass http://127.0.0.1:3100;
+        proxy_set_header Host DOMAIN;
+    }
+}

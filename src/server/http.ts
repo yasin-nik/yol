@@ -42,5 +42,7 @@ export function json(data: unknown, status = 200) {
 export function errorResponse(error: unknown) {
   if (error instanceof DomainError) return json({ error: error.message }, error.status);
   if (error instanceof z.ZodError) return json({ error: 'اطلاعات درخواست معتبر نیست.' }, 400);
+  // Do not log raw exceptions: gateway/DB messages can contain credentials or PII.
+  console.error(JSON.stringify({ event: 'HTTP_UNEXPECTED_ERROR', at: new Date().toISOString() }));
   return json({ error: 'ارتباط با سامانه برقرار نشد؛ دوباره تلاش کنید.' }, 500);
 }

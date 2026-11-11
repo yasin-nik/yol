@@ -15,7 +15,10 @@
     "admin:create": "node --env-file=.env ./node_modules/tsx/dist/cli.mjs scripts/create-admin.ts",
     "holds:expire": "node --env-file=.env ./node_modules/tsx/dist/cli.mjs scripts/expire-holds.ts",
     "test": "node --env-file=.env ./node_modules/vitest/vitest.mjs run",
-    "payments:reconcile": "node --env-file=.env ./node_modules/tsx/dist/cli.mjs scripts/reconcile-payments.ts"
+    "payments:reconcile": "node --env-file=.env ./node_modules/tsx/dist/cli.mjs scripts/reconcile-payments.ts",
+    "backup": "node --env-file=.env ./node_modules/tsx/dist/cli.mjs scripts/backup.ts",
+    "backup:drill": "node --env-file=.env ./node_modules/tsx/dist/cli.mjs scripts/restore-drill.ts",
+    "qa:m8:http": "node --env-file=.env ./node_modules/tsx/dist/cli.mjs scripts/m8-http.ts"
   },
   "dependencies": {
     "jsqr": "1.4.0",
