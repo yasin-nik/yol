@@ -24,6 +24,12 @@ export default async function AdminPage() {
       </div>
       <nav aria-label="ابزارهای مدیریت" className="mb-6 flex flex-wrap gap-3">
         <Link
+          href="/admin/finance"
+          className="inline-flex min-h-12 items-center rounded-xl border border-line bg-surface px-4 text-primary"
+        >
+          مالی و گزارش فروش
+        </Link>
+        <Link
           href="/check-in"
           className="inline-flex min-h-12 items-center rounded-xl border border-line bg-surface px-4 text-primary"
         >

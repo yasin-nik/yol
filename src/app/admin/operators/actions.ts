@@ -11,11 +11,11 @@ export async function operatorAction(_: FormState, form: FormData): Promise<Form
       sessionId: form.get('sessionId'),
     });
     return { success: 'حساب مسئول ورود برای همین سانس ساخته شد.' };
-  } catch (e) {
+  } catch (event) {
     return {
       error:
-        e instanceof DomainError
-          ? e.message
+        event instanceof DomainError
+          ? event.message
           : 'ثبت انجام نشد؛ ایمیل یکتا، رمز حداقل ۱۲ نویسه و سانس معتبر لازم است.',
     };
   }

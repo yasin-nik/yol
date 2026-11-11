@@ -12,9 +12,9 @@ export default async function CheckInPage() {
   let sessions;
   try {
     sessions = await operatorSessions(await adminToken());
-  } catch (e) {
-    if (e instanceof DomainError) redirect('/admin/login');
-    throw e;
+  } catch (event) {
+    if (event instanceof DomainError) redirect('/admin/login');
+    throw event;
   }
   return (
     <PageShell>
@@ -35,10 +35,10 @@ export default async function CheckInPage() {
         </div>
         {sessions.length ? (
           <Scanner
-            sessions={sessions.map((s) => ({
-              id: s.id,
-              label: `${s.title} · ${formatJalaliDate(s.starts_at)} · ${formatJalaliTime(s.starts_at)} · ${s.venue}`,
-              admitted: toFaDigits(s.admitted),
+            sessions={sessions.map((entry) => ({
+              id: entry.id,
+              label: `${entry.title} · ${formatJalaliDate(entry.starts_at)} · ${formatJalaliTime(entry.starts_at)} · ${entry.venue}`,
+              admitted: toFaDigits(entry.admitted),
             }))}
           />
         ) : (

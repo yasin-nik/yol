@@ -47,9 +47,10 @@ export default async function OperatorsPage() {
           <label className="form-label">
             سانس
             <select className="form-input" name="sessionId" required>
-              {sessions.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.title} · {formatJalaliDate(s.starts_at)} · {formatJalaliTime(s.starts_at)}
+              {sessions.map((entry) => (
+                <option key={entry.id} value={entry.id}>
+                  {entry.title} · {formatJalaliDate(entry.starts_at)} ·{' '}
+                  {formatJalaliTime(entry.starts_at)}
                 </option>
               ))}
             </select>

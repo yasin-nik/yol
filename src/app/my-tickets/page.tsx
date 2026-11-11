@@ -4,6 +4,7 @@ import { PageShell } from '@/components/shell';
 import { CustomerLogin, CustomerLogout } from '@/components/customer-login';
 import { PaymentButton, PrintTickets } from '@/components/payment-controls';
 import { StateBox } from '@/components/ui';
+import { OrderSupport } from '@/components/order-support';
 import { customerOrders } from '@/server/orders';
 import { customerTickets } from '@/server/tickets';
 import { paymentGateway } from '@/server/payment-gateway';
@@ -113,17 +114,21 @@ export default async function MyTicketsPage() {
                 }
               >
                 وضعیت:{' '}
-                {order.status === 'PAID'
-                  ? 'پرداخت موفق'
-                  : order.status === 'REVIEW'
-                    ? 'نیازمند رسیدگی مدیر'
-                    : order.status === 'FAILED'
-                      ? 'پرداخت ناموفق'
-                      : order.expired
-                        ? 'رزرو منقضی‌شده'
-                        : order.payment_state === 'UNKNOWN'
-                          ? 'نتیجه پرداخت نامشخص؛ در حال بررسی'
-                          : 'در انتظار پرداخت'}
+                {order.refund_requested
+                  ? order.refund_completed
+                    ? 'وجه بازگردانده شد؛ بلیت نامعتبر است'
+                    : 'در انتظار استرداد دستی؛ بلیت نامعتبر است'
+                  : order.status === 'PAID'
+                    ? 'پرداخت موفق'
+                    : order.status === 'REVIEW'
+                      ? 'نیازمند رسیدگی مدیر'
+                      : order.status === 'FAILED'
+                        ? 'پرداخت ناموفق'
+                        : order.expired
+                          ? 'رزرو منقضی‌شده'
+                          : order.payment_state === 'UNKNOWN'
+                            ? 'نتیجه پرداخت نامشخص؛ در حال بررسی'
+                            : 'در انتظار پرداخت'}
               </p>
               {order.status === 'REVIEW' && (
                 <p className="text-sm text-warning">
@@ -160,6 +165,15 @@ export default async function MyTicketsPage() {
                 </Link>
               )}
               <p className="break-all text-xs text-muted">شناسه سفارش: {order.id}</p>
+              <OrderSupport orderId={order.id} />
+              {order.support.map((s: { id: string; message: string; response?: string }) => (
+                <div key={s.id} className="space-y-2 rounded-xl border border-line p-3">
+                  <p className="whitespace-pre-wrap break-words">درخواست شما: {s.message}</p>
+                  <p className="whitespace-pre-wrap break-words text-muted">
+                    {s.response ? `پاسخ پشتیبانی: ${s.response}` : 'در انتظار پاسخ پشتیبانی'}
+                  </p>
+                </div>
+              ))}
             </article>
           ))}
         </div>

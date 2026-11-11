@@ -24,7 +24,7 @@ export function Scanner({
   const generation = useRef(0);
   function stop() {
     generation.current++;
-    stream.current?.getTracks().forEach((t) => t.stop());
+    stream.current?.getTracks().forEach((ticket) => ticket.stop());
     stream.current = null;
     if (timer.current) clearTimeout(timer.current);
     setCamera(false);
@@ -32,7 +32,7 @@ export function Scanner({
   useEffect(
     () => () => {
       generation.current++;
-      stream.current?.getTracks().forEach((t) => t.stop());
+      stream.current?.getTracks().forEach((ticket) => ticket.stop());
       if (timer.current) clearTimeout(timer.current);
     },
     [],
@@ -47,7 +47,7 @@ export function Scanner({
         audio: false,
       });
       if (generation.current !== current) {
-        media.getTracks().forEach((t) => t.stop());
+        media.getTracks().forEach((ticket) => ticket.stop());
         return;
       }
       stream.current = media;
@@ -87,8 +87,8 @@ export function Scanner({
       });
     }
   }
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
+  async function submit(event: React.FormEvent) {
+    event.preventDefault();
     if (pending) return;
     stop();
     setPending(true);
@@ -114,23 +114,26 @@ export function Scanner({
           className="form-input"
           value={sessionId}
           disabled={pending}
-          onChange={(e) => {
+          onChange={(event) => {
             stop();
-            setSession(e.target.value);
+            setSession(event.target.value);
             setCode('');
             setResult(undefined);
           }}
         >
-          {sessions.map((s) => (
-            <option value={s.id} key={s.id}>
-              {s.label}
+          {sessions.map((entry) => (
+            <option value={entry.id} key={entry.id}>
+              {entry.label}
             </option>
           ))}
         </select>
       </label>
-      <p className="text-sm text-muted">{sessions.find((s) => s.id === sessionId)?.label}</p>
       <p className="text-sm text-muted">
-        تعداد ورود در زمان باز شدن صفحه: {sessions.find((s) => s.id === sessionId)?.admitted}
+        {sessions.find((entry) => entry.id === sessionId)?.label}
+      </p>
+      <p className="text-sm text-muted">
+        تعداد ورود در زمان باز شدن صفحه:{' '}
+        {sessions.find((entry) => entry.id === sessionId)?.admitted}
       </p>
       <section className="rounded-2xl border border-line bg-surface p-5 space-y-4">
         <h2 className="font-bold">خواندن بلیت</h2>
@@ -160,7 +163,7 @@ export function Scanner({
               className="form-input font-mono"
               dir="ltr"
               value={code}
-              onChange={(e) => setCode(e.target.value)}
+              onChange={(event) => setCode(event.target.value)}
               required
               maxLength={64}
               pattern="[a-f0-9]{64}"

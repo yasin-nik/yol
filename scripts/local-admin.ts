@@ -1,4 +1,3 @@
-// Explicit owner-authorized local account; never accepts a remote database or production.
 import { randomBytes, scryptSync } from 'node:crypto';
 import { transaction } from '../src/server/db/transaction';
 import { closePool } from '../src/server/db/pool';
