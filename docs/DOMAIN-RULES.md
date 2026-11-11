@@ -3,15 +3,15 @@
 ## INV-01..14 و مکانیزم پیشنهادی
 | شناسه | قانون | مکانیزم اِعمال `[PROPOSED]` | تست |
 |---|---|---|---|
-| INV-01 | یک صندلی در یک سانس به دو سفارش موفق نمی‌رسد | اجراشده M3: PK(session_id,seat_id)، قفل سانس و UPDATE شرطی؛ فروش/سفارش در M5 تکمیل می‌شود | inventory.test.ts: INV-01، ۵۰ رقیب، یک رزرو موفق؛ فروش نهایی هنوز تست نشده |
+| INV-01 | یک صندلی در یک سانس به دو سفارش موفق نمی‌رسد | M3/M5: PK موجودی، قفل سانس، فروش اتمیک و UNIQUE(session_id,seat_id) بلیت | inventory.test.ts: ۵۰ رقیب رزرو؛ payments.test.ts: INV-01، دو سفارش تأییدشده رقیب، یک فروش |
 | INV-02 | رزرو موقت اتمیک | اجراشده M3: قفل سانس + تراکنش چندصندلی، مالکیت hold، انقضای فقط NONE | inventory.test.ts: INV-02، هم‌پوشانی/بازپخش/انقضا/پرداخت نامشخص/سانس مستقل |
-| INV-03 | پرداخت فقط با verify سرور | فقط ماژول Payments پس از استعلام درگاه | callback جعلی/بازگشت مرورگر |
-| INV-04 | بلیت فقط پس از پرداخت تأییدشده | یک سرویس صدور، در همان تراکنش تأیید | دور زدن API |
-| INV-05 | idempotency پرداخت/callback/بلیت | قید یکتا روی شناسه تراکنش، سفارش، آیتم←بلیت | تکرار callback/refresh |
+| INV-03 | پرداخت فقط با verify سرور | payments.ts: استعلام adapter سرور + اعتبارسنجی پاسخ و مبلغ دقیق | payments.test.ts: INV-03، callback جعلی/مبلغ نادرست/timeout |
+| INV-04 | بلیت فقط پس از پرداخت تأییدشده | تراکنش verify/فروش/صدور و trigger ticket_issue_guard | payments.test.ts: INV-04، درج مستقیم بدون verify رد می‌شود |
+| INV-05 | idempotency پرداخت/callback/بلیت | قید یکتای authority/reference/order/item/seat و قفل سانس | payments.test.ts: INV-05، ۵۰ callback، مرجع تکراری/rollback |
 | INV-06 | QR فقط یک‌بار | UPDATE شرطی check-in | دو اسکن هم‌زمان |
 | INV-07 | authz سمت سرور | policy مرکزی برای هر endpoint | دسترسی غیرمجاز |
 | INV-08 | بدون secret در کد/مخزن/لاگ | env vars، secret scan | بررسی bundle و لاگ |
-| INV-09 | rate-limit روی OTP/ورود/رزرو | شماره + IP + بازه | عبور از سقف |
+| INV-09 | rate-limit روی OTP/ورود/رزرو | شماره/چالش/مرورگر + سقف سراسری DB؛ IP پراکسی هنوز معتبرسازی نشده (D-024) | customer-orders.test.ts: INV-09، سقف ارسال/تلاش؛ تست‌های ورود/رزرو M2/M3 |
 | INV-10 | اعتبارسنجی همه ورودی‌ها و پاسخ سرویس‌ها | Zod در مرز API | ورودی مخرب |
 | INV-11 | Audit Log برای عملیات حساس | جدول فقط‌افزودنی | هر عملیات یک ردیف |
 | INV-12 | بکاپ + بازیابی آزمایش‌شده | اسکریپت + restore واقعی | ثبت در OPERATIONS.md |
