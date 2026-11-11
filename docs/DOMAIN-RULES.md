@@ -8,7 +8,7 @@
 | INV-03 | پرداخت فقط با verify سرور | payments.ts: استعلام adapter سرور + اعتبارسنجی پاسخ و مبلغ دقیق | payments.test.ts: INV-03، callback جعلی/مبلغ نادرست/timeout |
 | INV-04 | بلیت فقط پس از پرداخت تأییدشده | تراکنش verify/فروش/صدور و trigger ticket_issue_guard | payments.test.ts: INV-04، درج مستقیم بدون verify رد می‌شود |
 | INV-05 | idempotency پرداخت/callback/بلیت | قید یکتای authority/reference/order/item/seat و قفل سانس | payments.test.ts: INV-05، ۵۰ callback، مرجع تکراری/rollback |
-| INV-06 | QR فقط یک‌بار | UPDATE شرطی check-in | دو اسکن هم‌زمان |
+| INV-06 | QR فقط یک‌بار | M6: قفل سانس، INSERT با PK(ticket_id)، check_ins فقط‌افزودنی | check-in.test.ts: INV-06، دو اسکن هم‌زمان فقط یک ورود |
 | INV-07 | authz سمت سرور | policy مرکزی برای هر endpoint | دسترسی غیرمجاز |
 | INV-08 | بدون secret در کد/مخزن/لاگ | env vars، secret scan | بررسی bundle و لاگ |
 | INV-09 | rate-limit روی OTP/ورود/رزرو | شماره/چالش/مرورگر + سقف سراسری DB؛ IP پراکسی هنوز معتبرسازی نشده (D-024) | customer-orders.test.ts: INV-09، سقف ارسال/تلاش؛ تست‌های ورود/رزرو M2/M3 |

@@ -22,6 +22,20 @@ export default async function AdminPage() {
           <button className="min-h-11 rounded-lg border border-line px-4">خروج</button>
         </form>
       </div>
+      <nav aria-label="ابزارهای مدیریت" className="mb-6 flex flex-wrap gap-3">
+        <Link
+          href="/check-in"
+          className="inline-flex min-h-12 items-center rounded-xl border border-line bg-surface px-4 text-primary"
+        >
+          کنترل ورود
+        </Link>
+        <Link
+          href="/admin/operators"
+          className="inline-flex min-h-12 items-center rounded-xl border border-line bg-surface px-4 text-primary"
+        >
+          مسئولان ورود
+        </Link>
+      </nav>
       <p className="mb-6 text-sm text-muted">
         ۱. سالن و بخش‌ها را تعریف کنید. ۲. رویداد بسازید. ۳. سانس و قیمت‌ها را ثبت کنید. ۴. رویداد
         را منتشر کنید.

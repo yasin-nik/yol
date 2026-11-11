@@ -8,6 +8,7 @@ import { login, logout } from '@/server/auth';
 import { adminToken, ADMIN_COOKIE, cookieOptions } from '@/server/web-auth';
 import { createEvent, createSession, createVenue, setPublished } from '@/server/catalog';
 import { DomainError } from '@/server/errors';
+import { requireOperator } from '@/server/check-in';
 
 export type FormState = { error?: string; success?: string };
 
@@ -19,13 +20,15 @@ function message(error: unknown) {
 }
 
 export async function loginAction(_previous: FormState, form: FormData): Promise<FormState> {
+  let role = 'ADMIN';
   try {
     const token = await login({ email: form.get('email'), password: form.get('password') });
     (await cookies()).set(ADMIN_COOKIE, token, cookieOptions);
+    role = (await requireOperator(token)).role;
   } catch (error) {
     return { error: message(error) };
   }
-  redirect('/admin');
+  redirect(role === 'ADMIN' ? '/admin' : '/check-in');
 }
 
 export async function logoutAction() {

@@ -22,8 +22,9 @@ export async function requireAdmin(
     throw new DomainError('ابتدا وارد حساب مدیر شوید.', 401);
   const result = await client.query(
     `SELECT u.id FROM users u JOIN auth_sessions s ON s.user_id=u.id
-     WHERE s.token_hash=$1 AND s.expires_at > now() AND u.active AND u.role='ADMIN'`,
-    [tokenHash(token)],
+     WHERE s.token_hash=$1 AND s.expires_at > now() AND u.active AND u.role='ADMIN'
+     AND (NOT u.local_only OR $2)`,
+    [tokenHash(token), process.env.NODE_ENV !== 'production'],
   );
   if (!result.rowCount) throw new DomainError('دسترسی مدیر لازم است.', 403);
   return result.rows[0].id as string;
@@ -34,12 +35,17 @@ export async function login(input: unknown) {
   await rateLimit('login:global', 100, 60);
   await rateLimit(`login:${tokenHash(data.email)}`, 5, 900);
   const result = await getPool().query(
-    'SELECT id, password_hash, role, active FROM users WHERE email=$1',
+    'SELECT id, password_hash, role, active, local_only FROM users WHERE email=$1',
     [data.email],
   );
   const user = result.rows[0];
   const valid = await verifyPassword(data.password, user?.password_hash ?? dummyHash);
-  if (!valid || !user?.active || user.role !== 'ADMIN')
+  if (
+    !valid ||
+    !user?.active ||
+    !['ADMIN', 'CHECK_IN'].includes(user.role) ||
+    (user.local_only && process.env.NODE_ENV === 'production')
+  )
     throw new DomainError('اطلاعات ورود صحیح نیست.', 401);
   const token = newToken();
   await transaction(async (client) => {
@@ -47,7 +53,7 @@ export async function login(input: unknown) {
       "INSERT INTO auth_sessions(token_hash,user_id,expires_at) VALUES ($1,$2,now()+interval '8 hours')",
       [tokenHash(token), user.id],
     );
-    await audit(client, user.id, 'ADMIN_LOGIN', user.id);
+    await audit(client, user.id, user.role === 'ADMIN' ? 'ADMIN_LOGIN' : 'CHECK_IN_LOGIN', user.id);
   });
   return token;
 }
