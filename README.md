@@ -1,6 +1,6 @@
 ﻿# یول‌تیک (Yoltic) — پلتفرم فروش بلیت رویداد
 
-**وضعیت:** M0 تا M7 انجام شد؛ توقف پس از تگ m7 طبق دستور مالک. M8 شروع نشده است. مستندات: `AGENTS.md` · `docs/HANDOFF.md`.
+**وضعیت:** M0 تا M8 از نظر ساخت و QA محلی تکمیل‌اند؛ توقف در تگ m8. انتشار production و فروش واقعی آماده/تأیید نشده است. مستندات: `AGENTS.md` · `docs/HANDOFF.md` · `docs/QA-M8.md` · `docs/DEPLOYMENT.md`.
 
 ## اجرا از محیط تمیز
 1. Node.js 24.19.0 و PostgreSQL ۱۸ نصب باشد.
@@ -11,6 +11,8 @@
 
 ## دستورها
 `npm run lint` · `npm run typecheck` · `npm test` · `npm run build` · `npm run payments:reconcile`
+
+عملیات M8: `npm run backup`، `npm run backup:drill` (نیازمند PG_BIN ابزار موجود PostgreSQL؛ بدون نصب global). تست فقط M8 پس از build: `npm.cmd test -- tests/m8-load.test.ts tests/m8-backup.test.ts tests/m8-security.test.ts tests/m8-catalog.test.ts`. اجرای HTTP اختصاصی روی localhost:3108 با دیتابیس yoltick_test در HANDOFF توضیح داده شده است.
 
 ## مدیریت محلی
 - نشانی `/admin`؛ بدون ورود به `/admin/login` هدایت می‌شود.

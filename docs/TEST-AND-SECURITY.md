@@ -1,5 +1,23 @@
 # TEST-AND-SECURITY
 
+## جمع‌بندی نهایی M8
+گزارش جدیدتر `QA-M8.md` معتبر است؛ آمار زیر سوابق همان مراحل‌اند. فقط ۱۰ تست اختصاصی M8 در چهار فایل m8-*.test.ts اجرا شد و همگی موفق بودند؛ مجموعه مراحل قبل طبق دستور مالک دوباره اجرا نشد. بار خرید ۱۰۰۰/۵۰، HTTP ۵۰ خواندن نقشه، INV-12 با dump/restore واقعی، CSP/مبدأ/حجم/گارد تولید/secret، فیلترهای محصول، build/typecheck/lint و audit انجام شد. این نتایج محلی‌اند؛ تأیید متخصص مستقل و تست سرور مقصد باقی است.
+
+| INV | آزمون خودکار دارای شناسه و مکانیزم |
+|---|---|
+| 01/02 | inventory.test.ts، payments.test.ts؛ M8 بار کامل و رقابت با قفل سانس/قیود DB |
+| 03/04/05 | payments.test.ts؛ verify سرور، صدور اتمیک و قیود یکتا؛ بازپخش بار M8 |
+| 06 | check-in.test.ts؛ PK(ticket_id)/قفل، بازیابی وضعیت مصرف در M8 |
+| 07 | admin/inventory-api/checkout-api/check-in/finance tests؛ policy سمت سرور |
+| 08 | config.test.ts و m8-security.test.ts؛ منع Fake/secret و CSP |
+| 09 | admin/inventory/customer-orders tests؛ rate-limit پایدار DB |
+| 10 | admin/inventory-api/checkout-api و m8-security/m8-catalog tests؛ Zod/مبدأ/حجم |
+| 11 | admin/inventory/check-in/finance tests؛ ممیزی فقط‌افزودنی |
+| 12 | m8-backup.test.ts؛ dump، snapshot، restore در DB جدا و تطبیق داده/schema |
+| 13/14 | finance.test.ts؛ سوابق محافظت‌شده، ریال صحیح و UTC |
+
+اجرای M8 پس از build و با PG_BIN معتبر: `npm.cmd test -- tests/m8-load.test.ts tests/m8-backup.test.ts tests/m8-security.test.ts tests/m8-catalog.test.ts`. فایل secret test، JS کلاینت build را هم می‌خواند. اطلاعات دسترسی/توکن‌ها در گزارش ثبت نمی‌شوند. گزارش بار در `.local/qa/m8-load.json` و `m8-http.json` است؛ گزارش ثابت قابل انتقال در QA-M8.md قرار دارد.
+
 ## ردیابی INV ← تست
 هدف: هر INV یک تست با شناسه خودش داشته باشد. اجراشده تا M2: ۱۱ تست؛ admin.test.ts پوشش پایه INV-07/09/10/11/14 و format.test.ts تبدیل پول. بقیه شناسه‌ها در میلستون مرتبط تکمیل می‌شوند؛ پاس‌شده محسوب نمی‌شوند.
 
