@@ -62,3 +62,10 @@ M4 و M5 تکمیل شدند؛ دستور ۲۰۲۶/۱۱/۱۱ ادامه تا پ�
 - M8-04 DONE: دور جداگانه بازبینی همان عامل، Chrome بدون Playwright، رفع فیلترهای جاافتاده PRD و میان‌بر فوکوس، ۱۰ تست اختصاصی، build/typecheck/lint/audit موفق، QA-M8 و DEPLOYMENT.
 
 مرز پایان m8؛ M0..M8 تمام‌اند. این وضعیت به معنی تأیید G3 نیست: adapter واقعی، میزبان/HTTPS/پراکسی و بکاپ مستقل/هشدار، بازبینی متخصص و کارهای مالک باقی‌اند. M9 تعریف نشده و انتشار شروع نشده است. جزئیات QA-M8.md و DEPLOYMENT.md.
+
+## آماده‌سازی انتشار عمومی بدون فروش — ۲۰۲۶/۱۱/۱۵
+- DONE: حالت production preview با `PAYMENT_GATEWAY=disabled` و `SMS_PROVIDER=disabled` اضافه شد؛ `REAL_SALES_ENABLED=false` اجباری است و فروش واقعی فعال نمی‌شود.
+- DONE: فرمان `npm run start:public-preview`، نمونه تنظیمات `.env` و راهنمای استقرار HTTPS/Nginx ثبت شد.
+- DONE: `npm run lint`، `npm run typecheck` و `npm run build` اجرا و موفق شدند.
+- DONE: smoke production روی localhost انجام شد؛ صفحه اصلی و `/api/health` پاسخ `200` و CSP فعال بود.
+- OPEN: استقرار روی سرور واقعی، دامنه، HTTPS و بکاپ مستقل پس از تهیه سرور انجام می‌شود.
