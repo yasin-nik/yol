@@ -9,6 +9,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "start:public-preview": "node --env-file=.env node_modules/next/dist/bin/next start --hostname 127.0.0.1 -p 3100",
     "lint": "eslint src scripts tests",
     "typecheck": "tsc --noEmit",
     "migrate": "node --env-file=.env ./node_modules/tsx/dist/cli.mjs scripts/migrate.ts",

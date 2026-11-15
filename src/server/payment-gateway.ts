@@ -30,6 +30,22 @@ export interface PaymentGateway {
   checkoutUrl(authority: string): string;
 }
 
+/** Public preview adapter: the site is reachable, but checkout is disabled. */
+export class DisabledPaymentGateway implements PaymentGateway {
+  private unavailable(): never {
+    throw new DomainError('فروش و پرداخت در این نسخه فعال نیست.', 503);
+  }
+  create() {
+    return Promise.reject(this.unavailable());
+  }
+  verify() {
+    return Promise.reject(this.unavailable());
+  }
+  checkoutUrl(): string {
+    return this.unavailable();
+  }
+}
+
 export class FakePaymentGateway implements PaymentGateway {
   checkoutUrl(authority: string) {
     return '/payments/fake/' + authoritySchema.parse(authority);
@@ -69,6 +85,7 @@ export class FakePaymentGateway implements PaymentGateway {
   }
 }
 export function paymentGateway(): PaymentGateway {
+  if (process.env.PAYMENT_GATEWAY === 'disabled') return new DisabledPaymentGateway();
   if (process.env.PAYMENT_GATEWAY !== 'fake')
     throw new DomainError('درگاه پرداخت پیکربندی نشده است.', 503);
   return new FakePaymentGateway();

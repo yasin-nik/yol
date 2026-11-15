@@ -30,3 +30,17 @@ Build موفق است؛ این نسخه فقط با Fake در محیط محلی 
 در این نشست بکاپ توسعه و drill آزمایش واقعاً اجرا شدند؛ انتقال خارج ماشین، زمان‌بندی، TLS و nginx روی سرور هنوز آزموده نشده‌اند. RPO پیشنهادی تا ۲۴ ساعت با بکاپ روزانه است؛ RTO سرور هنوز سنجیده نشده، زمان drill محلی تضمین آن نیست.
 
 مراجع فنی: مستندات رسمی Next.js /docs/app/guides/content-security-policy، PostgreSQL 18 /docs/18/app-pgdump.html و /app-pgrestore.html، Nginx /en/docs/http/ngx_http_proxy_module.html. نسخه نمونه باید روی میزبان آینده اعتبارسنجی شود.
+
+## Public no-sales preview
+
+For the current licensing and presentation phase, deploy with a separate server `.env` (never commit it):
+
+```env
+NODE_ENV=production
+PAYMENT_GATEWAY=disabled
+SMS_PROVIDER=disabled
+REAL_SALES_ENABLED=false
+APP_ORIGIN=https://YOUR_DOMAIN
+```
+
+Run `npm ci`, `npm run build`, then `npm run start:public-preview`. Keep the app on `127.0.0.1:3100` behind Nginx and HTTPS. `/api/health` must return `200` from the server. Public pages are available; customer OTP, checkout, and payment intentionally return `503` until real adapters and G3 approval are complete.
