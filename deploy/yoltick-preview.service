@@ -1,0 +1,27 @@
+[Unit]
+Description=YolTick public preview (sales disabled)
+After=network.target postgresql.service
+Requires=postgresql.service
+
+[Service]
+Type=simple
+User=yoltick_web
+Group=yoltick_web
+WorkingDirectory=/opt/yoltick
+Environment=NODE_ENV=production
+ExecStart=/usr/bin/node --env-file=/opt/yoltick/.env /opt/yoltick/node_modules/next/dist/bin/next start --hostname 127.0.0.1 -p 3100
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/yoltick/.next/cache
+RestrictSUIDSGID=true
+CapabilityBoundingSet=
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+
+[Install]
+WantedBy=multi-user.target
