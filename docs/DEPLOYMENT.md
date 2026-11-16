@@ -1,7 +1,7 @@
 # استقرار و بازگشت — بسته M8
 
 ## وضعیت واقعی
-Build موفق است؛ این نسخه فقط با Fake در محیط محلی اجرا می‌شود. `next start` عمداً با Fake، provider خالی یا نام ساختگی متوقف می‌شود. **این بسته آماده production و فروش واقعی نیست.** M9 در برنامه تعریف نشده؛ کار بعدی آماده‌سازی انتشار و عبور G2/G3 است، با درخواست جداگانه مالک. تعارض ترتیب اتصال واقعی/اولین انتشار در D-040 باز است.
+نسخه معرفی بدون فروش در ۲۰۲۶/۱۱/۱۶ روی سرور ایران، فقط روی loopback اجرا و آزموده شد؛ گزارش `deploy/PREVIEW-SERVER-SETUP.md` مرجع وضعیت فعلی است. DNS/HTTPS و انتشار عمومی انجام نشده‌اند. `next start` با Fake، provider خالی یا نام ساختگی متوقف می‌شود؛ providerهای disabled برای معرفی مجازند. فروش واقعی آماده/تأیید نشده است. بخش‌های M8 زیر، راهنمای عملیات آینده‌اند و تاریخچه اجرای محلی را توصیف می‌کنند.
 
 ## پیش‌نیازهای انتشار آینده (اکنون اجرا نشده)
 1. سرور داخل ایران و حساب‌ها به نام مالک؛ تأیید G2 برای هزینه/حساب. Node طبق `.nvmrc` و PostgreSQL ۱۸؛ نصب پیش‌نیاز یا تغییر سیستم نیازمند مجوز مالک است.
@@ -32,6 +32,17 @@ Build موفق است؛ این نسخه فقط با Fake در محیط محلی 
 مراجع فنی: مستندات رسمی Next.js /docs/app/guides/content-security-policy، PostgreSQL 18 /docs/18/app-pgdump.html و /app-pgrestore.html، Nginx /en/docs/http/ngx_http_proxy_module.html. نسخه نمونه باید روی میزبان آینده اعتبارسنجی شود.
 
 ## Public no-sales preview
+
+Server inspection and the completed internal service setup are recorded in
+`deploy/PREVIEW-SERVER-SETUP.md`. The installed service uses a separate non-admin
+`yoltick_web` OS/database identity with existing local peer authentication;
+database migrations stay owned by `yoltick_app`. Runtime health/home returned 200,
+OTP/payment returned 503, and restart passed. Public DNS/HTTPS remain pending.
+Backup was explicitly deferred by the owner (D-048).
+
+فهرست دقیق فایل‌های انتقال و اسکریپت ساخت آرشیو حداقلی در
+`deploy/TRANSFER-MANIFEST.md` و `deploy/make-transfer-archive.ps1` نگهداری می‌شود.
+آرشیو شامل secret، `node_modules`، `.next`، git، تست‌ها و مستندات توسعه نیست.
 
 For the current licensing and presentation phase, deploy with a separate server `.env` (never commit it):
 

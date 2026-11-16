@@ -1,49 +1,43 @@
-# ادامه راه‌اندازی نسخه معرفی — ۲۰۲۶/۱۱/۱۶
+﻿# گزارش اجرای داخلی نسخه معرفی — ۲۰۲۶/۱۱/۱۶
 
-این بسته آماده بررسی است و هنوز روی سرور اعمال نشده است. فروش و پیامک خاموش می‌مانند.
-ایجاد کاربر/دسترسی سرور، انتقال فایل و نصب سرویس فقط پس از تأیید مالک انجام می‌شود.
-انتشار عمومی، DNS، تنظیم Nginx و HTTPS در این مرحله انجام نمی‌شود.
+بسته اصلی با تأیید مالک (D-048) روی سرور پارس‌پک اجرا شد. فروش و پیامک خاموش‌اند. بکاپ طبق دستور صریح مالک انجام نشد؛ سرور بکاپ مستقل بعداً آماده می‌شود. انتشار عمومی، DNS و HTTPS انجام نشده‌اند.
 
-## وضعیت مشاهده‌شده در کنسول پارس‌پک
+## وضعیت نهایی و آزمون‌های واقعی
 
-- مسیر `/opt/yoltick`، Node `v24.19.0` در `/usr/bin/node`؛ خروجی build قبلی موفق روی صفحه دیده شد، build در این نوبت دوباره اجرا نشد.
-- PostgreSQL و Nginx فعال؛ PostgreSQL فقط `127.0.0.1:5432`؛ شنونده‌ای روی ۳۱۰۰ نبود.
-- نقش و دیتابیس `yoltick_app` موجود؛ نقش superuser/CREATEDB نیست؛ تعداد جدول‌های public صفر.
-- `.env` موجود نیست؛ هیچ واحد systemd با نام `yoltick*` وجود ندارد.
-- کاربر موجود `yoltick` عضو sudo است؛ کاربر پیشنهادی `yoltick_web` موجود نیست.
-- قوانین local پایگاه داده از peer استفاده می‌کنند؛ تغییر pg_hba یا ذخیره رمز لازم نیست.
+- مسیر `/opt/yoltick`؛ Node `24.19.0` در `/usr/bin/node`، PostgreSQL 18. نصب وابستگی‌ها و build در مرحله قبلی موفق بود؛ این نوبت build تکرار نشد.
+- migrationهای `0001` تا `0009` اجرا شدند؛ اجرای مجدد `up to date` بود. هر ۳۱ جدول public متعلق به `yoltick_app` است.
+- حساب سیستم `yoltick_web` با shell برابر nologin، بدون sudo؛ نقش DB با همین نام بدون superuser/CREATEDB/CREATEROLE/REPLICATION/BYPASSRLS و بدون رمز ساخته شد. اتصال Unix socket با peer و `current_user=yoltick_web` موفق بود؛ pg_hba تغییر نکرد.
+- runtime مالک جدول نیست. بررسی واقعی مجوز CREATE در public، SELECT در schema_migrations و TRUNCATE در users همگی false بود. SQL مالکیت یا عضویت در نقش مالک نمی‌دهد و Fake table را مستثنا می‌کند.
+- `.env` با `root:yoltick_web` و `0640` نصب شد؛ فقط `.next/cache` به مالکیت runtime درآمد. فایل secret در مخزن ثبت نشده است.
+- واحد `yoltick-preview.service` نصب و `active`/`enabled` شد؛ شنونده فقط `127.0.0.1:3100` است. دسترسی نوشتن سرویس به cache و پوشه موقت خصوصی محدود است.
+- `/api/health` برابر ۲۰۰ با `status:ok`، صفحه اصلی ۲۰۰، CSP و هدرهای امنیتی در پاسخ موجود بودند. POST معتبر با Origin دامنه به `/api/customer` و `/api/payments` هر دو ۵۰۳ دادند؛ پیامک یا پرداخت واقعی انجام نشد.
+- restart سرویس موفق و health پس از آن دوباره ۲۰۰ بود. این restart آزمون reboot کامل سرور نیست.
+- `systemd-analyze verify` خطایی برای واحد برنامه نداد؛ دو هشدار مربوط به گزینه قدیمی CPUAccounting در واحد موجود `systemd-fsck-root.service` و نادیده‌گرفتن آن نمایش داده شد؛ واحد سیستم تغییر نکرد.
 
-## فایل‌های آماده
+## تطبیق فایل‌ها
 
-- `preview.env.example`: تنظیمات نسخه معرفی، اتصال Unix socket با peer و دامنه `yoltic.ir`؛ فایل واقعی فقط روی سرور ساخته می‌شود.
-- `preview-runtime.sql`: نقش مستقل runtime، فاقد مالکیت جدول یا امکان مدیریت DB؛ جدول migration و Fake دسترسی نمی‌گیرند.
-- `yoltick-preview.service`: کاربر غیرمدیر، bind روی loopback، دسترسی نوشتن فقط به cache برنامه و پوشه موقت خصوصی.
+انتقال بلند در VNC ناقص می‌شد؛ فایل‌های ناقص SQL اجرا نشدند. نسخه فشرده به بخش‌های کوچک منتقل و پس از بازسازی، SHA-256 سرور دقیقاً با نسخه محلی یکسان شد:
 
-## ترتیب اجرا پس از تأیید
+| فایل محلی | SHA-256 |
+| --- | --- |
+| `preview-runtime.sql` | `0bcf8c9700eaae3b81bdbab43a50f0140f46a0f4876db06860bbc667ec17bd6e` |
+| `preview.env.example` | `6ae88caf43c855bcc6612b456760643c177e5653a58862eed0e17f9b2e17e6c7` |
+| `yoltick-preview.service` | `5e6a97e68af99949dd325933592160c3d01308ae67da19050e4618a409458c4b` |
 
-۱. پیش‌نیازها دوباره بررسی شوند؛ اگر `.env`، نقش/کاربر `yoltick_web`، جدول یا سرویس تازه‌ای دیده شد، وضعیت موجود بررسی شود و چیزی بازنویسی نشود. از DB قبل از migration بکاپ custom گرفته و checksum ثبت شود؛ فایل محدود به postgres و داخل `/opt/yoltick/.local/backups` بماند. این بکاپ جایگزین بکاپ مستقل نیست.
+نسخه SQL تأییدشده روی سرور `deploy/runtime.sql` است. فایل‌های واسط انتقال در `deploy/` سرور حفظ شدند؛ ورودی سرویس فقط `.env` و واحد نصب‌شده است.
 
-۲. migration با نقش مالک موجود اجرا شود، بدون رمز و بدون تغییر نقش postgres:
+## عملیات قابل تکرار
 
 ```sh
 cd /opt/yoltick
+# migration با مالک اختصاصی؛ بدون تغییر نقش postgres
 runuser -u postgres -- env DATABASE_URL='postgresql:///yoltick_app?host=/var/run/postgresql' PGOPTIONS='-c role=yoltick_app' /usr/bin/node node_modules/tsx/dist/cli.mjs scripts/migrate.ts
+systemctl is-active yoltick-preview
+curl -sS http://127.0.0.1:3100/api/health
 ```
 
-۳. چهار فایل این بسته به `/opt/yoltick/deploy` منتقل شوند؛ SQL با `psql -X -v ON_ERROR_STOP=1 -d yoltick_app` تحت کاربر postgres اجرا شود. نقش runtime باید فقط به همین DB و جدول‌های متعلق به `yoltick_app` دسترسی داشته باشد. کاربر سیستم `yoltick_web` با `--system --user-group --no-create-home --shell /usr/sbin/nologin` ایجاد شود؛ عضو sudo نباشد.
+SQL ایجاد نقش دوباره اجرا نشود؛ CREATE ROLE عمداً در صورت وجود نقش خطا می‌دهد. هنگام migration بعدی دسترسی جدول‌های تازه باید جداگانه بازبینی شود؛ default grant عمومی وجود ندارد.
 
-۴. فایل `.env` از نمونه با مالکیت `root:yoltick_web` و سطح ۰۶۴۰ ساخته شود. source، migration و build در مالکیت مدیر بمانند. فقط `.next/cache` متعلق به کاربر سرویس شود. با `runuser -u yoltick_web` اتصال peer و `SELECT current_user` بررسی شود؛ مالکیت جدول‌ها و نداشتن مجوز CREATE/TRUNCATE و دسترسی به schema_migrations کنترل شود.
+## باقی‌مانده
 
-۵. فایل سرویس به `/etc/systemd/system/yoltick-preview.service` منتقل و با `systemd-analyze verify` بررسی شود؛ سپس daemon-reload و enable/start. هیچ پورت عمومی یا تنظیم امنیتی موجود تغییر نکند.
-
-۶. واقعاً آزمایش شود: migration مجدد باید up to date باشد؛ سرویس فعال و شنونده فقط `127.0.0.1:3100`؛ health و صفحه اصلی ۲۰۰ با CSP؛ درخواست OTP و پرداخت ۵۰۳؛ restart سرویس و پاسخ مجدد؛ نقش runtime اجازه تغییر ساختار و غیرفعال‌کردن triggerها نداشته باشد. خروجی‌ها بدون secret در گزارش ثبت شوند.
-
-اگر آزمون شکست خورد، سرویس متوقف و عیب بررسی شود؛ DB، کاربر، فایل و migration حذف یا معکوس نشوند. فایل `.env` و لاگ کامل در مخزن ثبت نشوند.
-
-## تأیید موردنیاز
-
-فقط انتقال همین فایل‌ها، بکاپ و migration دیتابیس اختصاصی، ایجاد حساب محدود و نصب/اجرای سرویس محلی. انتشار عمومی، تغییر DNS/فایروال، حساب مدیر سایت و فروش واقعی شامل این تأیید نیستند. کنترل‌کننده Chrome برای ایجاد دسترسی حساس، تأیید هنگام اقدام می‌خواهد؛ AGENTS.md نیز این کار را L2 می‌داند.
-
-## اعتبارسنجی این نوبت
-
-بررسی سرور فقط خواندنی بود. فایل‌ها با کد اتصال pg، migrationها، گاردهای production و نسخه/مسیر واقعی Node تطبیق داده شدند. نمونه env واقعاً با گارد production و parser اتصال pg آزمایش شد: adapterهای disabled، فروش خاموش، مسیر socket، نام DB و کاربر صحیح بودند. `git diff --check` هم موفق بود. SQL، نصب سرویس و smoke سرور هنوز اجرا نشده‌اند؛ آزمایش موفق برای آن‌ها ادعا نمی‌شود.
+DNS، Nginx/HTTPS و انتشار عمومی نیازمند مرحله و تأیید خود هستند. بکاپ مستقل، هشدار و آزمون بار روی سرور هنوز انجام نشده‌اند. فروش واقعی و حساب‌های واقعی پرداخت/پیامک همچنان خارج از این اجرای داخلی‌اند. آزمون‌های کامل برنامه در این نوبت تکرار نشدند؛ تغییر کد کاربردی نداشتیم.

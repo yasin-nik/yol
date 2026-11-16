@@ -69,3 +69,41 @@ M4 و M5 تکمیل شدند؛ دستور ۲۰۲۶/۱۱/۱۱ ادامه تا پ�
 - DONE: `npm run lint`، `npm run typecheck` و `npm run build` اجرا و موفق شدند.
 - DONE: smoke production روی localhost انجام شد؛ صفحه اصلی و `/api/health` پاسخ `200` و CSP فعال بود.
 - OPEN: استقرار روی سرور واقعی، دامنه، HTTPS و بکاپ مستقل پس از تهیه سرور انجام می‌شود.
+
+## شناسایی سرور پارس‌پک — ۲۰۲۶/۱۱/۱۵
+- DONE: پنل سرور ابری بررسی شد؛ سرور روشن، Ubuntu26، 1 vCPU، 2GB RAM، 40GB دیسک، Tehran11 / THR-DC11 و IPv4 عمومی فعال است.
+- DONE: بخش‌های پیکربندی، شبکه، فایروال، اسنپ‌شات، بکاپ خودکار و تغییر سیستم‌عامل مشاهده شد؛ هیچ تغییر عملیاتی اعمال نشد.
+- OPEN: راه‌اندازی امن سرور با SSH، فایروال حداقلی، کاربر غیر root، PostgreSQL اختصاصی، Nginx/HTTPS، بکاپ مستقل و پایش باید انجام شود.
+
+## آماده‌سازی پایه سرور — ۲۰۲۶/۱۱/۱۵
+- DONE: ورود به کنسول وب پارس‌پک، تغییر اجباری رمز root توسط مالک، شناسایی Ubuntu 26.04.1 و منابع واقعی.
+- DONE: نصب ابزارهای پایه، Nginx، UFW و Fail2ban؛ UFW با deny ورودی و مجوز SSH/HTTP/HTTPS فعال شد.
+- DONE: Swap دو گیگ ساخته و در `/etc/fstab` ثبت شد.
+- DONE: PostgreSQL 18 نصب و سرویس آماده شد؛ نقش و دیتابیس اختصاصی `yoltick_app` ساخته و مالک دیتابیس تنظیم شد.
+- PARTIAL: Node.js نصب شد اما نسخه 22.21.1 است؛ پروژه نسخه 24.19.0 را پین کرده و باید با بسته رسمی checksum‌دار اصلاح شود.
+- OPEN: آزمون نهایی کاربر سرویس، انتقال پروژه، تنظیم SSH با کلید، تنظیم Nginx/HTTPS، مهاجرت schema و اتصال برنامه باقی است.
+
+## آماده‌سازی انتقال محدود پروژه — ۲۰۲۶/۱۱/۱۵
+- DONE: فهرست انتقال در `deploy/TRANSFER-MANIFEST.md` ثبت شد؛ secret، node_modules، `.next`، git، تست‌ها و مستندات توسعه عمداً خارج هستند.
+- DONE: اسکریپت محلی ساخت آرشیو حداقلی در `deploy/make-transfer-archive.ps1` اضافه شد؛ آرشیو فقط از source، migration، public، فایل‌های build و ابزارهای عملیاتی لازم ساخته می‌شود.
+- BLOCKED: کنسول وب پارس‌پک هنگام ادامه کار با `Access denied. Code: 208` در دسترس نبود و اتصال مجدد نیز همان خطا را برگرداند. انتقال، نصب Node 24.19.0، SSH، Nginx و migration پس از پایدار شدن کنسول انجام می‌شود.
+
+## انتقال و پاک‌سازی روی سرور — ۲۰۲۶/۱۱/۱۶
+- DONE: مخزن عمومی `yasin-nik/yol` با clone کم‌عمق به `/opt/yoltick` منتقل شد؛ مشکل قبلی credential helper با `git -c credential.helper=` رفع شد.
+- DONE: فایل‌های غیرضروری runtime حذف شدند: `.git`، `docs`، `tests`، README، AGENTS، تنظیمات توسعه و scriptهای دمو/محلی. source، `migrations`، `public`، scriptهای عملیاتی، package و تنظیمات build باقی ماندند.
+- DONE: `npm ci` و `npm run build` روی سرور موفق شدند؛ build تولیدی Next.js بدون خطا تکمیل شد.
+- OPEN: ساخت `.env` سرور، اجرای migration روی `yoltick_app`، تنظیم مالکیت کاربر سرویس، Nginx/HTTPS و smoke نهایی باقی است.
+
+## بررسی ادامه استقرار و بسته اجرای محدود — ۲۰۲۶/۱۱/۱۶
+- DONE: در Chrome بدون Playwright، Node `24.19.0` در `/usr/bin/node`، فعال‌بودن PostgreSQL/Nginx، دیتابیس اختصاصی خالی و اتصال local از نوع peer بررسی شد. `.env` و سرویس برنامه موجود نیستند و پورت ۳۱۰۰ شنونده ندارد.
+- DONE: مشخص شد کاربر موجود `yoltick` عضو sudo است؛ بسته پیشنهادی حساب مستقل `yoltick_web`، SQL دسترسی محدود، env بدون رمز با peer و سرویس systemd متصل به loopback در `deploy/` آماده شد. گزارش و ترتیب اجرا: `deploy/PREVIEW-SERVER-SETUP.md`.
+- DONE: نمونه env با گارد production پروژه و parser اتصال PostgreSQL واقعاً آزمایش شد؛ حالت disabled، فروش خاموش، نام کاربر/DB و مسیر Unix socket صحیح بودند. `git diff --check` هم موفق بود.
+- DONE: تأیید مالک برای انتقال، migration و حساب/سرویس محدود دریافت و در D-048 ثبت شد؛ نتیجه اجرا در بخش بعد است. بکاپ به دستور مالک موکول شد. عمومی‌سازی، DNS/HTTPS، فروش و پیامک در این مرحله فعال نمی‌شوند.
+
+## اجرای بسته اصلی روی سرور — ۲۰۲۶/۱۱/۱۶
+- DONE: migrationهای 0001 تا 0009 اجرا شدند؛ اجرای مجدد `up to date` بود. هر ۳۱ جدول public متعلق به `yoltick_app` است.
+- DONE: حساب سیستم و نقش DB مستقل `yoltick_web` بدون sudo/رمز ساخته شد؛ اتصال peer موفق و مجوز CREATE روی schema، خواندن schema_migrations و TRUNCATE روی users همگی false بودند.
+- DONE: فایل‌های SQL، env و systemd پس از انتقال با SHA-256 نسخه محلی تطبیق داده شدند؛ `.env` با root:yoltick_web و 0640، cache با مالک runtime نصب شد.
+- DONE: `yoltick-preview` فعال و enabled است؛ فقط `127.0.0.1:3100` شنونده دارد. health و صفحه اصلی ۲۰۰، CSP موجود، OTP و پرداخت ۵۰۳؛ restart و health مجدد ۲۰۰ واقعاً آزموده شدند.
+- OPEN: انتشار عمومی، DNS و HTTPS انجام نشده‌اند؛ این نتیجه فقط اجرای داخلی است. جزئیات و هشدار غیرمسدودکننده systemd در `deploy/PREVIEW-SERVER-SETUP.md` ثبت شد.
+- DEFERRED: بکاپ این مرحله طبق دستور صریح مالک انجام نمی‌شود؛ سرور بکاپ مستقل در آینده آماده خواهد شد (D-048).
