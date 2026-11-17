@@ -36,6 +36,9 @@ export function SiteFooter() {
     <footer className="mt-16 border-t border-line bg-surface">
       <div className="mx-auto flex max-w-5xl flex-wrap gap-4 px-4 py-6 text-sm text-muted">
         <span>یول‌تیک — فروش بلیت رویداد</span>
+        <Link href="/about" className="underline">
+          درباره ما
+        </Link>
         <Link href="/rules" className="underline">
           قوانین
         </Link>
